@@ -7,28 +7,31 @@ export const App = () => {
 	const [error, setError] = useState(null);
 
 	useEffect(() => {
-		const fetchTodos = async () => {
-			try {
-				const response = await fetch('https://jsonplaceholder.typicode.com/todos');
-
-				if (!response.ok) {
-					throw new Error(`Ошибка HTTP! Статус: ${response.status}`);
-				}
-
-				const data = await response.json();
-				setTodos(data);
-			} catch (error) {
-				setError(error);
-			} finally {
-				setLoading(false);
-			}
+		const fetchTodos = () => {
+			setLoading(true);
+			fetch('https://jsonplaceholder.typicode.com/todos')
+				.then(response => {
+					if (!response.ok) {
+						throw new Error(`Ошибка HTTP! Статус: ${response.status}`);
+					}
+					return response.json();
+				})
+				.then(data => {
+					setTodos(data);
+				})
+				.catch(error => {
+					setError(error);
+				})
+				.finally(() => {
+					setLoading(false);
+				});
 		};
 
 		fetchTodos();
 	}, []);
 
 	if (loading) {
-		return <div className={styles.loading}>Загрузка списка дел…</div>;
+		return <div className={styles.loading}>Загрузка списка...</div>;
 	}
 
 	if (error) {
